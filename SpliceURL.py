@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
-__doc__ = "Stitching generation URL"
+__doc__ = "Splice, Split and Modify URL"
 __date__ = '2016-06-16'
 __author__ = "Mr.tao <staugur@saintic.com>"
-__version__ = '0.1'
+__version__ = '0.2'
 __license__ = 'MIT'
 
 import re
@@ -17,7 +17,7 @@ class SpliceException(Exception):
 class ArgError(SpliceException):
     pass
 
-class SpliceURL(object):
+class Splice(object):
     """拼接URL，传参要求
     1、第一个参数必须是域名,domain=?;
     2、第二个参数是域名协议,scheme=?,默认是http;
@@ -31,14 +31,14 @@ class SpliceURL(object):
 
     def __init__(self, domain, scheme='http', path='/', params=None, query=None, fragment=None):
         """ 
-        >>> s=SpliceURL.SpliceURL(domain='saintic.com')
+        >>> s=SpliceURL.Splice(domain='saintic.com')
         >>> s.do()
         'http://saintic.com/'
 
-        >>> SpliceURL.SpliceURL(domain='saintic.com', query={"username": "tcw", "password": "xxx", "id": True}).do()
+        >>> SpliceURL.Splice(domain='saintic.com', query={"username": "tcw", "password": "xxx", "id": True}).do()
         'http://saintic.com/?username=tcw&password=xxx&id=True'
 
-        >>> SpliceURL.SpliceURL('saintic.com', "https", "api/blog", '', 'api=true&token=true', '20').do()
+        >>> SpliceURL.Splice('saintic.com', "https", "api/blog", '', 'api=true&token=true', '20').do()
         'https://saintic.com/api/blog?api=true&token=true#20'
         """
 
@@ -64,5 +64,50 @@ class SpliceURL(object):
     def __unicode__(self):
         return "Splice URL for SaintIC ULR Project!"
 
-    def __str__(self):
-        return "Splice URL for SaintIC ULR Project!"
+
+class Split(object):
+    """拆分URL，参数为url，返回元组，顺序为scheme,domain, path, params, query, fragment"""
+
+    def __init__(self, url):
+        """
+        >>> import SpliceURL
+        >>> Url = "https://www.saintic.com/auth?username=hello&password=wolrd"
+        >>> print SpliceURL.Split(Url).do()
+        ('https', 'www.saintic.com', '/auth', '', 'username=hello&password=wolrd', '')
+        """
+        self.url = url
+
+    def do(self):
+        "run it, you can get a tuple for (scheme, domain, path, params, query, fragment)"
+        _PR = urlparse.urlparse(self.url)
+        return _PR.scheme, _PR.netloc, _PR.path, _PR.params, _PR.query, _PR.fragment
+
+    def __unicode__(self):
+        return "Split URL for SaintIC ULR Project!"
+
+
+class Modify(object):
+    """修改URL，为ULR项目开设的组件，传入一个url和dict查询字典，组成成新url返回。
+    典型的应用场景是Web应用接受登录注册请求访问ULR控制，操作完后跳转到新URL，这个新URL带有额外查询参数。
+    """
+
+    def __init__(self, url, **args):
+        """
+        >>> import SpliceURL
+        >>> ReqUrl = "https://www.saintic.com/auth?username=hello&password=wolrd" #Accept a URL request, add the parameter and return!
+        >>> AddArg = {"token": "abcdefghijklmnopqrstuvwxyz", "session": "F29243D66E9F50499AE5F3F873AE3516", "SignIn": True}
+        >>> NewUrl = SpliceURL.Modify(ReqUrl, **AddArg).do()
+        >>> print NewUrl
+        https://www.saintic.com/auth?username=hello&password=wolrd&SignIn=True&token=abcdefghijklmnopqrstuvwxyz&session=F29243D66E9F50499AE5F3F873AE3516
+        """
+        if not isinstance(args, dict):
+            raise TypeError("args ask a dict as query")
+        self.url  = url
+        self.args = args
+
+    def do(self):
+        "run it, get a new url"
+        scheme, domain, path, params, query, fragment = Split(self.url).do()
+        query += '&'
+        query += urllib.urlencode(self.args)
+        return Splice(scheme=scheme, domain=domain, path=path, params=params, query=query, fragment=fragment).do()

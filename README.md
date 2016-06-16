@@ -1,5 +1,5 @@
 # SpliceURL
-Splice, Assembly URL's python package
+Splice, Split and Modify URL's python package
 
 # Usage:
 
@@ -18,14 +18,14 @@ Splice, Assembly URL's python package
     Everything is ok, now run do().
     """
 
-    >>> s=SpliceURL.SpliceURL(domain='saintic.com')
+    >>> s=SpliceURL.Splice(domain='saintic.com')
     >>> s.do()
     'http://saintic.com/'
 
-    >>> SpliceURL.SpliceURL(domain='saintic.com', query={"username": "tcw", "password": "xxx", "id": True}).do()
+    >>> SpliceURL.Splice(domain='saintic.com', query={"username": "tcw", "password": "xxx", "id": True}).do()
     'http://saintic.com/?username=tcw&password=xxx&id=True'
 
-    >>> SpliceURL.SpliceURL('saintic.com', "https", "api/blog", '', 'api=true&token=true', '20').do()
+    >>> SpliceURL.Splice('saintic.com', "https", "api/blog", '', 'api=true&token=true', '20').do()
     'https://saintic.com/api/blog?api=true&token=true#20'
 
     可以参考demo.py
