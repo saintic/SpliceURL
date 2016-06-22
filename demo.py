@@ -8,6 +8,8 @@ def splice():
 
     print SpliceURL.Splice('saintic.com', "https", "api/blog", '', 'api=true&token=true', '20').do()
 
+    print SpliceURL.Splice(ip="127.0.0.1").do()
+
 def split():
     Url = "https://www.saintic.com/auth?username=hello&password=wolrd"
     print SpliceURL.Split(Url).do()

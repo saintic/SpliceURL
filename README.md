@@ -15,12 +15,18 @@ Splice, Split and Modify URL's python package
     4、第四个参数是参数,params=?,默认是None;
     5、第五个参数是查询,query=?,默认是None,可传入字符串(如user=xxx&passwd=xxx)或字典(如{"user": "xxxx", "passwd": ""xxxx"});
     6、第六个参数是段位,fragment=?,默认是None.
+
+    7、额外参数：
+        接收ip,port组合字典,拼接ip格式的url,port默认80.
     Everything is ok, now run do().
     """
 
     >>> s=SpliceURL.Splice(domain='saintic.com')
     >>> s.do()
     'http://saintic.com/'
+
+    >>> s=SpliceURL.Splice(ip="127.0.0.1").do()
+    'http://127.0.0.1/'
 
     >>> SpliceURL.Splice(domain='saintic.com', query={"username": "tcw", "password": "xxx", "id": True}).do()
     'http://saintic.com/?username=tcw&password=xxx&id=True'
@@ -30,3 +36,10 @@ Splice, Split and Modify URL's python package
 
     可以参考demo.py
 ```
+
+# ChangeLog
+> v0.3
+    1. Splice类增加诸如IP:PORT格式的URL拼接，PORT端口值默认80, 兼容v0.2。
+
+> v0.2
+
