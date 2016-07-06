@@ -2,9 +2,9 @@
 #-*- coding:utf-8 -*-
 
 __doc__     = "Splice, Split and Modify URL"
-__date__    = '2016-06-16'
+__date__    = '2016-07-06'
 __author__  = "Mr.tao <staugur@saintic.com>"
-__version__ = '0.3'
+__version__ = '0.4'
 __license__ = 'MIT'
 
 import re
@@ -65,17 +65,22 @@ class Splice(object):
             if port == 80:
                 self.uri = ip
             else:
-                self.uri = "%s:%d "%(ip, port)
+                self.uri = "%s:%d"%(ip, port)
         self.path   = path
         self.params = params
         self.fragment = fragment
 
     def do(self):
-        "run it, you can get a good stitching of the complete URL!"
+        "run it, you can get a good stitching of the complete URL."
         return urlparse.urlunparse((self.scheme, self.uri, self.path, self.params, self.query, self.fragment))
 
+    @property
+    def geturl(self):
+        "Equivalent class properties of the `do` function"
+        return self.do()
+
     def __unicode__(self):
-        return "Splice URL for SaintIC ULR Project!"
+        return "Splice URL for SaintIC ULR Project."
 
 
 class Split(object):
@@ -96,7 +101,7 @@ class Split(object):
         return _PR.scheme, _PR.netloc, _PR.path, _PR.params, _PR.query, _PR.fragment
 
     def __unicode__(self):
-        return "Split URL for SaintIC ULR Project!"
+        return "Split URL for SaintIC ULR Project."
 
 
 class Modify(object):
@@ -124,3 +129,8 @@ class Modify(object):
         query += '&'
         query += urllib.urlencode(self.args)
         return Splice(scheme=scheme, domain=domain, path=path, params=params, query=query, fragment=fragment).do()
+
+    @property
+    def geturl(self):
+        "Equivalent class properties of the `do` function"
+        return self.do()

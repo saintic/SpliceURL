@@ -3,12 +3,14 @@ import SpliceURL
 def splice():
     s=SpliceURL.Splice(domain='saintic.com')
     print s.do()
+    print s.geturl
     
     print SpliceURL.Splice(domain='saintic.com', query={"username": "tcw", "password": "xxx", "id": True}).do()
 
     print SpliceURL.Splice('saintic.com', "https", "api/blog", '', 'api=true&token=true', '20').do()
 
-    print SpliceURL.Splice(ip="127.0.0.1").do()
+    print SpliceURL.Splice(ip="127.0.0.1:80").do()
+    print SpliceURL.Splice(ip="127.0.0.1", port=1000).geturl
 
 def split():
     Url = "https://www.saintic.com/auth?username=hello&password=wolrd"
@@ -19,7 +21,8 @@ def modify():
     ReqUrl = "https://www.saintic.com/auth?username=hello&password=wolrd"
     AddArg = {"token": "abcdefghijklmnopqrstuvwxyz", "session": "F29243D66E9F50499AE5F3F873AE3516", "SignIn": True}
 
-    NewUrl = SpliceURL.Modify(ReqUrl, **AddArg).do()
+    #NewUrl = SpliceURL.Modify(ReqUrl, **AddArg).do()
+    NewUrl = SpliceURL.Modify(ReqUrl, **AddArg).geturl
     print NewUrl
     print SpliceURL.Split(NewUrl).do()
 

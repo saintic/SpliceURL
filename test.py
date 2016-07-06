@@ -15,6 +15,8 @@ class SpliceTest(unittest.TestCase):
         assert "https://saintic.com/blog#20" in SpliceURL.Splice('saintic.com', "https", "blog", '', '', '20').do()
         assert "http://api.com" in SpliceURL.Splice(ip="127.0.0.1", port=1001, domain="api.com").do()
         assert "http://127.0.0.1:10000" in SpliceURL.Splice(ip="127.0.0.1", port=10000).do()
+        #print SpliceURL.Splice(ip="127.0.0.1", port=80).url
+        assert "http://127.0.0.1:10000" in SpliceURL.Splice(ip="127.0.0.1", port=10000).geturl
 
     def test_Split(self):
         url='https://api.saintic.com/user?id=admin&time=true'
