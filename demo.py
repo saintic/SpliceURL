@@ -9,8 +9,8 @@ def splice():
 
     print SpliceURL.Splice('saintic.com', "https", "api/blog", '', 'api=true&token=true', '20').do()
 
-    print SpliceURL.Splice(ip="127.0.0.1:80").do()
-    print SpliceURL.Splice(ip="127.0.0.1", port=1000).geturl
+    print SpliceURL.Splice(ip="127.0.0.1", scheme="https", port=550).do()
+    print SpliceURL.Splice(domain="saintic.com", port=80).geturl
 
 def split():
     Url = "https://www.saintic.com/auth?username=hello&password=wolrd"

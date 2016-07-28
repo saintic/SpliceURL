@@ -38,8 +38,6 @@ Splice, Split and Modify URL's python package
 ```
 
 # ChangeLog
-> v0.3
-    1. Splice类增加诸如IP:PORT格式的URL拼接，PORT端口值默认80, 兼容v0.2。
-
-> v0.2
-
+> v0.5
+1. 增加domain+port形式URL。
+2. 根据scheme设定默认port, http=80, https=443, 默认port不显示在URL中。

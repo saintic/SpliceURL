@@ -2,9 +2,9 @@
 #-*- coding:utf-8 -*-
 
 __doc__     = "Splice, Split and Modify URL"
-__date__    = '2016-07-06'
+__date__    = '2016-07-28'
 __author__  = "Mr.tao <staugur@saintic.com>"
-__version__ = '0.4'
+__version__ = '0.5'
 __license__ = 'MIT'
 
 import re
@@ -41,18 +41,17 @@ class Splice(object):
         >>> SpliceURL.Splice('saintic.com', "https", "api/blog", '', 'api=true&token=true', '20').do()
         'https://saintic.com/api/blog?api=true&token=true#20'
         """
-        _dn = re.compile(r'([0-9a-zA-Z\_*\.*\-*]+).([a-zA-Z0-9\-*\_*\.*]+)\.([a-zA-Z]+$)')
-        _ip = re.compile(r'(?<![\.\d])(?:\d{1,3}\.){3}\d{1,3}(?![\.\d])')
+        _dn_pat = re.compile(r'([0-9a-zA-Z\_*\.*\-*]+).([a-zA-Z0-9\-*\_*\.*]+)\.([a-zA-Z]+$)')
+        _ip_pat = re.compile(r'(?<![\.\d])(?:\d{1,3}\.){3}\d{1,3}(?![\.\d])')
         ip  = kw.get("ip")
-        port= kw.get("port", 80)
-        if domain and re.match(_dn, domain) == None:
-            raise ArgError("domain miss match!")
-        if ip and re.match(_ip, ip) == None:
-            raise ArgError("ip miss match!")
-        if port != None and not isinstance(port, int):
-            raise TypeError("port only is integer.")
-        if query != None and not isinstance(query, (str, dict)):
-            raise TypeError("query only is string or dict.")
+        if scheme == "http":
+            port = kw.get("port", 80)
+        if scheme == "https":
+            port = kw.get("port", 443)
+        if domain and re.match(_dn_pat, domain) == None: raise ArgError("domain miss match!")
+        if ip and re.match(_ip_pat, ip) == None: raise ArgError("ip miss match!")
+        if port != None and not isinstance(port, int): raise TypeError("port only is integer.")
+        if query != None and not isinstance(query, (str, dict)): raise TypeError("query only is string or dict.")
 
         if isinstance(query, dict):
             self.query = urllib.urlencode(query)
@@ -60,9 +59,16 @@ class Splice(object):
             self.query = query
         self.scheme = scheme
         if domain:
-            self.uri = domain
+            if port == 80 and scheme == "http":
+                self.uri = domain
+            elif port == 443 and scheme == "https":
+                self.uri = domain
+            else:
+                self.uri = "%s:%d" %(domain, port)
         else:
-            if port == 80:
+            if port == 80 and scheme == "http":
+                self.uri = ip
+            elif port == 443 and scheme == "https":
                 self.uri = ip
             else:
                 self.uri = "%s:%d"%(ip, port)
