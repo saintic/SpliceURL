@@ -4,7 +4,11 @@
 __doc__     = "Splice, Split and Modify URL"
 __date__    = '2016-09-20'
 __author__  = "Mr.tao <staugur@saintic.com>"
+<<<<<<< HEAD
 __version__ = '1.1'
+=======
+__version__ = '1.0'
+>>>>>>> df85f117d5105c7e5f884839a9240c9544dc3119
 __license__ = 'MIT'
 
 import re
