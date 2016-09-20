@@ -9,7 +9,10 @@ __license__ = 'MIT'
 
 import re
 import urllib
-import urlparse
+try:
+    import urlparse
+except ImportError:
+    from urllib.parse import urlparse
 
 class SpliceException(Exception):
     pass
