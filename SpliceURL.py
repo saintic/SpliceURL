@@ -2,9 +2,9 @@
 #-*- coding:utf-8 -*-
 
 __doc__     = "Splice, Split and Modify URL"
-__date__    = '2016-07-28'
+__date__    = '2016-09-20'
 __author__  = "Mr.tao <staugur@saintic.com>"
-__version__ = '0.5'
+__version__ = '0.6'
 __license__ = 'MIT'
 
 import re
@@ -96,7 +96,7 @@ class Split(object):
         """
         >>> import SpliceURL
         >>> Url = "https://www.saintic.com/auth?username=hello&password=wolrd"
-        >>> print SpliceURL.Split(Url).do()
+        >>> print(SpliceURL.Split(Url).do())
         ('https', 'www.saintic.com', '/auth', '', 'username=hello&password=wolrd', '')
         """
         self.url = url
@@ -121,7 +121,7 @@ class Modify(object):
         >>> ReqUrl = "https://www.saintic.com/auth?username=hello&password=wolrd" #Accept a URL request, add the parameter and return!
         >>> AddArg = {"token": "abcdefghijklmnopqrstuvwxyz", "session": "F29243D66E9F50499AE5F3F873AE3516", "SignIn": True}
         >>> NewUrl = SpliceURL.Modify(ReqUrl, **AddArg).do()
-        >>> print NewUrl
+        >>> print(NewUrl)
         https://www.saintic.com/auth?username=hello&password=wolrd&SignIn=True&token=abcdefghijklmnopqrstuvwxyz&session=F29243D66E9F50499AE5F3F873AE3516
         """
         if not isinstance(args, dict):

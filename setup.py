@@ -6,7 +6,7 @@ from SpliceURL import __version__, __doc__, __author__
 try:
     from setuptools import setup, find_packages
 except ImportError:
-    print "Install it using your package manager (usually python-setuptools) or via pip (pip install setuptools)."
+    print("Install it using your package manager (usually python-setuptools) or via pip (pip install setuptools).")
     exit(127)
 
 setup(
