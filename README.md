@@ -41,3 +41,6 @@ Splice, Split and Modify URL's python package
 > v0.5
 1. 增加domain+port形式URL。
 2. 根据scheme设定默认port, http=80, https=443, 默认port不显示在URL中。
+
+> v0.5 
+1. support python3
