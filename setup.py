@@ -20,7 +20,7 @@ setup(
     download_url = 'https://github.com/saintic/SpliceURL/releases/tag/v0.5',
     license = "MIT",
     packages = find_packages(),
-    py_modules = [ 'SpliceURL', 'demo', ],
+    py_modules = [ 'SpliceURL', ],
     classifiers = [
         'Environment :: Other Environment',
         'Intended Audience :: Developers',
