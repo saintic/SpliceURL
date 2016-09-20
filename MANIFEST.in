@@ -2,4 +2,3 @@ include SpliceURL.py
 include setup.py
 include README.md
 include LICENSE
-include test.py

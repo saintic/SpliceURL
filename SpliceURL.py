@@ -4,7 +4,7 @@
 __doc__     = "Splice, Split and Modify URL"
 __date__    = '2016-09-20'
 __author__  = "Mr.tao <staugur@saintic.com>"
-__version__ = '0.6'
+__version__ = '1.1'
 __license__ = 'MIT'
 
 import re
@@ -28,8 +28,12 @@ class Splice(object):
     4、第四个参数是参数,params=?,默认是None;
     5、第五个参数是查询,query=?,默认是None,可传入字符串(如user=xxx&passwd=xxx)或字典(如{"user": "xxxx", "passwd": ""xxxx"});
     6、第六个参数是段位,fragment=?,默认是None.
+    7、支持IP、PORT
 
     Everything is ok, now run do().
+    PS:
+        When `scheme` is https, the default port is 443.
+        When `scheme` is http, the default port is 80.
     """
 
     def __init__(self, domain=None, scheme='http', path='/', params=None, query=None, fragment=None, **kw):
