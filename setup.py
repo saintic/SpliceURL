@@ -15,8 +15,8 @@ setup(
     author = __author__,
     author_email = re.split('<?>?', __author__)[1],
     keywords = "URL, splice, split, modify",
-    url = 'https://github.com/saintic/SpliceURL',
-    download_url = 'https://github.com/saintic/SpliceURL/releases/tag/v1.1',
+    url = 'https://github.com/staugur/SpliceURL',
+    download_url = 'https://github.com/saintic/SpliceURL/releases/tag/v'+ __version__,
     license = "MIT",
     py_modules = [ 'SpliceURL', ],
     classifiers = [

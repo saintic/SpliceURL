@@ -1,91 +1,51 @@
-#!/usr/bin/env python
 #-*- coding:utf-8 -*-
 
 __doc__     = "Splice, Split and Modify URL"
-__date__    = '2016-09-20'
+__date__    = '2016-11-10'
 __author__  = "Mr.tao <staugur@saintic.com>"
-__version__ = '1.1'
+__version__ = '1.2'
 __license__ = 'MIT'
 
 import re
 import urllib
-try:
-    import urlparse
-except ImportError:
-    from urllib.parse import urlparse
+from urlparse import urlunparse, urlparse
+from posixpath import normpath
+from os.path import join as urljoin
 
-class SpliceException(Exception):
-    pass
-
-class ArgError(SpliceException):
+class ArgError(Exception):
     pass
 
 class Splice(object):
-    """拼接URL，传参要求
-    1、第一个参数必须是域名,domain=?;
-    2、第二个参数是域名协议,scheme=?,默认是http;
-    3、第三个参数是路径,path=?,默认是/;
-    4、第四个参数是参数,params=?,默认是None;
-    5、第五个参数是查询,query=?,默认是None,可传入字符串(如user=xxx&passwd=xxx)或字典(如{"user": "xxxx", "passwd": ""xxxx"});
-    6、第六个参数是段位,fragment=?,默认是None.
-    7、支持IP、PORT
-
-    Everything is ok, now run do().
-    PS:
-        When `scheme` is https, the default port is 443.
-        When `scheme` is http, the default port is 80.
     """
-
-    def __init__(self, domain=None, scheme='http', path='/', params=None, query=None, fragment=None, **kw):
-        """ 
-        >>> s=SpliceURL.Splice(domain='saintic.com')
-        >>> s.do()
-        'http://saintic.com/'
-
-        >>> SpliceURL.Splice(domain='saintic.com', query={"username": "tcw", "password": "xxx", "id": True}).do()
-        'http://saintic.com/?username=tcw&password=xxx&id=True'
-
-        >>> SpliceURL.Splice('saintic.com', "https", "api/blog", '', 'api=true&token=true', '20').do()
-        'https://saintic.com/api/blog?api=true&token=true#20'
-        """
-        _dn_pat = re.compile(r'([0-9a-zA-Z\_*\.*\-*]+).([a-zA-Z0-9\-*\_*\.*]+)\.([a-zA-Z]+$)')
-        _ip_pat = re.compile(r'(?<![\.\d])(?:\d{1,3}\.){3}\d{1,3}(?![\.\d])')
-        ip  = kw.get("ip")
-        if scheme == "http":
-            port = kw.get("port", 80)
-        if scheme == "https":
-            port = kw.get("port", 443)
-        if domain and re.match(_dn_pat, domain) == None: raise ArgError("domain miss match!")
-        if ip and re.match(_ip_pat, ip) == None: raise ArgError("ip miss match!")
-        if port != None and not isinstance(port, int): raise TypeError("port only is integer.")
-        if query != None and not isinstance(query, (str, dict)): raise TypeError("query only is string or dict.")
-
-        if isinstance(query, dict):
-            self.query = urllib.urlencode(query)
+    拼接URL，参数顺序为scheme, netloc, port, path, params, query, fragment
+    其中netloc为必须参数
+    """
+    def __init__(self, scheme='http', netloc=None, port=None, path='/', params=None, query=None, fragment=None):
+        if not netloc:
+            raise ArgError("Not netloc")
+        if port in (80, None) and scheme == "http":
+            self.netloc = netloc
+        elif port in (443, None) and scheme == "https":
+            self.netloc = netloc
         else:
-            self.query = query
-        self.scheme = scheme
-        if domain:
-            if port == 80 and scheme == "http":
-                self.uri = domain
-            elif port == 443 and scheme == "https":
-                self.uri = domain
+            self.netloc = "%s:%s" %(netloc, port)
+        if query:
+            if isinstance(query, dict):
+                self.query = urllib.urlencode(query)
+            elif isinstance(query, str):
+                self.query = query
             else:
-                self.uri = "%s:%d" %(domain, port)
+                raise TypeError("query is string or dict")
         else:
-            if port == 80 and scheme == "http":
-                self.uri = ip
-            elif port == 443 and scheme == "https":
-                self.uri = ip
-            else:
-                self.uri = "%s:%d"%(ip, port)
-        self.path   = path
-        self.params = params
+            self.query= ''
+        self.scheme   = scheme
+        self.path     = path
+        self.params   = params
         self.fragment = fragment
 
     def do(self):
         "run it, you can get a good stitching of the complete URL."
-        return urlparse.urlunparse((self.scheme, self.uri, self.path, self.params, self.query, self.fragment))
+        return urlunparse((self.scheme, self.netloc, self.path, self.params, self.query, self.fragment))
 
     @property
     def geturl(self):
@@ -97,20 +57,16 @@ class Splice(object):
 
 
 class Split(object):
-    """拆分URL，参数为url，返回元组，顺序为scheme,domain, path, params, query, fragment"""
+    """拆分URL，参数为url，返回元组，顺序为scheme, netloc, path, params, query, fragment"""
 
     def __init__(self, url):
-        """
-        >>> import SpliceURL
-        >>> Url = "https://www.saintic.com/auth?username=hello&password=wolrd"
-        >>> print(SpliceURL.Split(Url).do())
-        ('https', 'www.saintic.com', '/auth', '', 'username=hello&password=wolrd', '')
-        """
+        if not "http://" in url and not "https://" in url:
+            raise ArgError("A url is not complete, the lack of HTTP protocol")
         self.url = url
 
     def do(self):
-        "run it, you can get a tuple for (scheme, domain, path, params, query, fragment)"
-        _PR = urlparse.urlparse(self.url)
+        "run it, you can get a tuple for (scheme, netloc, path, params, query, fragment)"
+        _PR = urlparse(self.url)
         return _PR.scheme, _PR.netloc, _PR.path, _PR.params, _PR.query, _PR.fragment
 
     def __unicode__(self):
@@ -118,30 +74,28 @@ class Split(object):
 
 
 class Modify(object):
-    """修改URL，为ULR项目开设的组件，传入一个url和dict查询字典，组成成新url返回。
+    """
+    修改URL，为ULR项目开设的组件，传入一个url和dict查询字典，组成成新url返回。
     典型的应用场景是Web应用接受登录注册请求访问ULR控制，操作完后跳转到新URL，这个新URL带有额外查询参数。
     """
 
-    def __init__(self, url, **args):
-        """
-        >>> import SpliceURL
-        >>> ReqUrl = "https://www.saintic.com/auth?username=hello&password=wolrd" #Accept a URL request, add the parameter and return!
-        >>> AddArg = {"token": "abcdefghijklmnopqrstuvwxyz", "session": "F29243D66E9F50499AE5F3F873AE3516", "SignIn": True}
-        >>> NewUrl = SpliceURL.Modify(ReqUrl, **AddArg).do()
-        >>> print(NewUrl)
-        https://www.saintic.com/auth?username=hello&password=wolrd&SignIn=True&token=abcdefghijklmnopqrstuvwxyz&session=F29243D66E9F50499AE5F3F873AE3516
-        """
-        if not isinstance(args, dict):
-            raise TypeError("args ask a dict as query")
-        self.url  = url
-        self.args = args
+    def __init__(self, url, path=None, query=None):
+        if not "http://" in url and not "https://" in url:
+            raise ArgError("A url is not complete, the lack of HTTP protocol")
+        self.url = url
+        self.path = path
+        self.query = query
 
     def do(self):
         "run it, get a new url"
-        scheme, domain, path, params, query, fragment = Split(self.url).do()
-        query += '&'
-        query += urllib.urlencode(self.args)
-        return Splice(scheme=scheme, domain=domain, path=path, params=params, query=query, fragment=fragment).do()
+        scheme, netloc, path, params, query, fragment = Split(self.url).do()
+
+        if isinstance(self.query, dict):
+            query = query + "&" + urllib.urlencode(self.query) if query else urllib.urlencode(self.query)
+
+        path = urljoin(path, self.path).replace('\\', '/') if self.path else path
+        
+        return Splice(scheme=scheme, netloc=netloc, path=path, params=params, query=query, fragment=fragment).geturl
 
     @property
     def geturl(self):
